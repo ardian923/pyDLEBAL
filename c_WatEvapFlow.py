@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 ## Soil-Plant-Atmospheric Continuum calculation emphasizing on surface energy balance
 ## Developed initially by Ardiansyah (UNSOED), http://ardiansyah.net
-## USE WITH "OoPython-ETo.xls" !! translated from EvPaddy-Laz9.26, CELIA STYLE
+## USE WITH "doubleLayerEB.xls" !! translated from EvPaddy-Laz9.26, CELIA STYLE
 # write by Dr.Ardiansyah for research purpose
-# ask for permission from me : ardi.plj@gmail.com if you want to use this. It's free
+# ask for permission from me : ardi.plj@gmail.com (cc : ard@unsoed.ac.id) if you want to use this. It's free
 
 # we're going to use Microsoft Excel spreadsheet and xlrd xlwt module to link to Python
 from xlrd import open_workbook
