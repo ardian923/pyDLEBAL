@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 ## Soil-Plant-Atmospheric Continuum calculation emphasizing on surface energy balance
-## Developed initially by Ardiansyah (UNSOED), http://ardiansyah.net
+## Developed initially by Ardiansyah (UNSOED), http://ardiansyah.net, email : ardi.plj@gmail.com , ard@unsoed.ac.id
 
 import os as os ##operating system function
 import numpy as np ##numerical python library
