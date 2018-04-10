@@ -12,7 +12,7 @@ from xlutils.copy import copy
 
 # example writing and reading from/to excel
 ################################
-workbook_name = 'OoPython-ETo.xls'
+workbook_name = 'doubleLayerEB.xls'
 sheet0	= 'Model'
 sheet1	= 'Inputs'
 sheet2	= '1-Layer'

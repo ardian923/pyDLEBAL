@@ -1,14 +1,10 @@
 #! /usr/bin/env python
 ## Soil-Plant-Atmospheric Continuum calculation emphasizing on surface energy balance
-## Developed initially by Ardiansyah (UNSOED), http://ardiansyah.net
-
-##ardiansyah@AL-FATIH-II:~/Desktop/oosheet-1.0$ oocalc OoPython-ETo.ods -accept="socket,host=localhost,port=2002;urp;StarOffice.ServiceManager"
-##python
+## Developed initially by Ardiansyah (UNSOED), http://ardiansyah.net, email : ardi.plj@gmail.com , cc : ard@unsoed.ac.id
 
 import os as os ##operating system function
-from oosheet import OOSheet as pyo ##open office sheet
 import numpy as np ##numerical python library
-import pylab as plt ##plotting library
+import matplotlib.pyplot as plt
 import scipy as sc ##scientific python library
 import math as mth ##matemathical operation library
 

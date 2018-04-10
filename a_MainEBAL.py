@@ -1,17 +1,15 @@
 #! /usr/bin/env python
 ## Soil-Plant-Atmospheric Continuum calculation emphasizing on surface energy balance
 ## Developed initially by Ardiansyah (UNSOED), http://ardiansyah.net
-
-##ardiansyah@AL-FATIH-II:~/Desktop/oosheet-1.0$ oocalc OoPython-ETo.ods -accept="socket,host=localhost,port=2002;urp;StarOffice.ServiceManager"
-##python
+# ask for permission from me : ardi.plj@gmail.com (cc : ard@unsoed.ac.id) if you want to use this. It's free
 
 # import all module from file, reading all parameters in spreadsheet
 import os as os ##operating system function
 from oosheet import OOSheet as pyo ##open office sheet
-import OoPython-ETo as et
-import WatEvapFlow as wef
-import HeatFlow as hf
-import FuncLibrary as fl
+import b_doubleLayerEB as et
+import c_WatEvapFlow as wef
+import d_HeatFlow as hf
+import e_FuncLibrary as fl
 
 
 ## Simulation parameters
