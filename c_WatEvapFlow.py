@@ -92,7 +92,7 @@ def geoGrid(depth, n, dz1):  ## Geometric grid with dry layer
         sc = sc + i * i
     dz = depth / sc
     z[0] = z[1] = 0
-    if (dz1 <> 0):
+    if (dz1 != 0):
         z[2] = z[1] + dz1
         for i in xrange(2, m, 1):
             z[i + 1] = z[i] + dz * i * i
@@ -345,8 +345,8 @@ def thomasAlgorithm(i1, A, B, C, D):  ##tridiagonal matrix solution
         D[i + 1] = D[i + 1] - A[i + 1] * D[i]  ## update D
         print "Thomas A B C D", A[i], B[i], C[i], D[i]
     x[m] = D[m] / B[m];
-    print "PPPPPPPPPPPPPPPPPPPPPPPPPPP", pn[m], D[m] / B[m]
-    print x[15]
+    #print "PPPPPPPPPPPPPPPPPPPPPPPPPPP", pn[m], D[m] / B[m]
+    #print x[15]
     for i in xrange(m - 1, i1 - 1, -1):
         x[i] = D[i] - C[i] * x[i + 1]
     return x
@@ -394,8 +394,7 @@ def solverWatEvapFlow(n, dt, flux, evap, psurface):
                 D[i] = -(1 - eps) * ((qli[i - 1] - qli[i]) + (qvi[i - 1] + qvi[i])) - cpu[i] * p[i] + (
                             wu[i] - wiu[i]) * (v[i] / dt) - (ResLCoefn[i] - ResLCoefn[i - 1]) - (
                                    ResVCoefn[i] + ResVCoefn[i - 1])
-        print "qvn[0], qln[0],qvn[0]-qln[0] ", qln[0], qvn[0], qvn[0] - qln[0]
-        print "DDDDDDDDDDDDDDDDDDDDDDDDDDDDD", D[1], D[14], D[13], B[15]
+        #print "qvn[0], qln[0],qvn[0]-qln[0] ", qln[0], qvn[0], qvn[0] - qln[0]
         ## preparing to solve tridiagonal matrix
         if (psurface < 0):  ## dirichlet BC not flux BC, start calculation from i = 2
             D[1] = 0;
@@ -408,7 +407,7 @@ def solverWatEvapFlow(n, dt, flux, evap, psurface):
         ## calculate water content at each node and total error of mass balance
         wu, dwudp = waterCont(p, a, b, c, d, e, f)  ## if p is an array, wu and dwudp are also array, no need looping
         wnu, dwnudp = waterCont(pn, a, b, c, d, e, f)
-        print "pi ", pi
+        #print "pi ", pi
         print "p ", p
         print "pn EUY !", pn
         print "qln ", qln
@@ -483,10 +482,11 @@ if __name__ == '__main__':  ## Run as standalone program
     e_sat, de_sat = SVP(Ta)
     e_act = AVP(Ta, Twb, alt)
     RH = e_act / e_sat
-    print RH
+    print 'RH', RH
 
     ## solve for water-evap flow every timestep
     for i in xrange(time.size):
+        print "=========================================================================="
         print "time = ", time[i], "======================================================"
         ETp = rs1.cell_value(143,
                              2)  ## flux is converted in spreedsheet, from mm/day to m/(10 minutes), timestep is in 10 minutes
