@@ -54,7 +54,7 @@ eps = rs1.cell_value(118, 2)
 dz1 = rs1.cell_value(43, 2)
 ## Hydraulics parameters
 ws = rs1.cell_value(121, 2)  ## saturated water content
-ks = rs1.cell_value(122, 2)  ## saturated hydraulic conductivity
+ks = rs1.cell_value(122, 2)  ## saturated hydraulic conductivity, mm/s
 ae = rs1.cell_value(123, 2)  ## air entry potential
 a1 = rs1.cell_value(124, 2)
 b1 = rs1.cell_value(125, 2)
@@ -72,16 +72,16 @@ dt = rs1.cell_value(138, 2);
 dt = float(dt)  ## timestep
 inittime = rs1.cell_value(139, 2)
 endtime = rs1.cell_value(140, 2)
-im = rs1.cell_value(141, 2)
+im     = rs1.cell_value(141, 2)
 maxits = rs1.cell_value(142, 2)
 ## Vapor related parameters
-Mw = rs1.cell_value(53, 2)  ## ava. in EB prog
-R = rs1.cell_value(48, 2)  ## ava. in EB prog
-Dv = rs1.cell_value(57, 2)  ## ava. in EB prog
-rho_w = rs1.cell_value(54, 2)  ## ava. in EB prog
+Mw     = rs1.cell_value(53, 2)  ## ava. in EB prog
+R      = rs1.cell_value(48, 2)  ## ava. in EB prog
+Dv     = rs1.cell_value(57, 2)  ## ava. in EB prog
+rho_w  = rs1.cell_value(54, 2)  ## ava. in EB prog
 p_init = rs1.cell_value(42, 2)  ## in kPa
-p_init = -1 * np.abs(p_init) * 0.102  ## convert kPa to mH2O
-alt = rs1.cell_value(12, 2)  ## ava. in EB prog
+p_init = 1 * np.abs(p_init) * 0.102  ## convert kPa to mH2O
+alt    = rs1.cell_value(12, 2)  ## ava. in EB prog
 
 
 def geoGrid(depth, n, dz1):  ## Geometric grid with dry layer

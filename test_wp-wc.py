@@ -47,8 +47,9 @@ if __name__ == '__main__':  ## Run simulation as standalone program
     p_kPa = np.array([1, 10, 33, 100, 500, 1000, 1500])
     p_mmH2O = np.array([102.0, 1019.7, 3365.0, 10197.0, 50985.0, 101970.0, 152955.0])
     p_cmH2O = np.array([10.20, 101.97, 336.50, 1019.70, 5098.50, 10197.00, 15295.50])
+    p_mH2O = np.array([0.1020, 1.0197, 3.3650, 10.1970, 50.9850, 101.9700, 152.9550])
 
-    p = p_kPa
+    p = p_mH2O
     theta, dtheta = waterCont(p, a, b, c, d, e, f)
     wc = theta
     kh = hydrConductivity(ks, wc, ws, a1, b1, c1)
