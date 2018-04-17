@@ -150,8 +150,7 @@ def hydrConductivity(ks, wc, ws, a1, b1, c1):
 
 ## ## Vapor phase parameters to calculate
 def soilHumidity(p, T):
-    #p = (1 / 0.102) * p  ##convert from mH2O to kPa
-    #already in kPa
+    p = (1 / 0.102) * p  ##convert from mH2O to kPa
     p = np.abs(p);
     p = -p  # required p to be (-) to obtain ha between 0 - 1
     soilHumidity = np.exp(Mw * p / (R * (T + 273)))  ##numpy array inserted
@@ -206,8 +205,8 @@ def k_bar(i):
 def q_liquid(i):
     ## i is element number; upper p is i, lower is i+1
     ki, kn = k_bar(i)
-    qli = -(ki / (z[i + 1] - z[i]) * (pi[i + 1] - pi[i])) * 101.97 + ki   #ada konversi kPa ke mmH2O
-    qln = -(kn / (z[i + 1] - z[i]) * (pn[i + 1] - pn[i])) * 101.97 + kn   #ada konversi kPa ke mmH2O
+    qli = -(ki / (z[i + 1] - z[i]) * (pi[i + 1] - pi[i])) * 1000 + ki   #ada konversi mH2O ke mmH2O
+    qln = -(kn / (z[i + 1] - z[i]) * (pn[i + 1] - pn[i])) * 1000 + kn   #ada konversi mH2O ke mmH2O
     J_liquid = (1 - eps) * qli + eps * qln  ##flux hasil perhitungan antara dua timestep, bukan dua level iterasi
     print "qli, qln", qli, qln, pi[i + 1], pi[i], ki, kn
     return qli, qln, J_liquid
@@ -227,9 +226,9 @@ def kv_kvT(i):
     c3 = 1 + 2.64 / np.sqrt(my);
     eta = 9.5 + 3 * w[i] - (9.5 - 1) * np.exp(-np.power((c3 * w[i]), 4))
     ## humidity initial, and final end of timestep
-    #p[i] = p[i] * 101.97                #convert kPa to mmH2O
-    #pi[i] = p[i] * 101.97                #convert kPa to mmH2O
-    #pn[i] = p[i] * 101.97                #convert kPa to mmH2O
+    #p[i] = p[i] * 0.10197                #convert to kPa from mH2O
+    #pi[i] = p[i] * 0.10197               #convert to kPa from mH2O
+    #pn[i] = p[i] * 0.10197               #convert to kPa from mH2O
     h[i] = soilHumidity(p[i], T[i])
     hi[i] = soilHumidity(pi[i], Ti[i])
     hn[i] = soilHumidity(pn[i], Tn[i])
