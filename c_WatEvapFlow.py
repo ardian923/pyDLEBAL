@@ -124,7 +124,7 @@ def waterCont(p, a, b, c, d, e, f):
     ##consult spreedsheet for a, b, c, d, e and f
     # p[p > ae] = ae #EVALUATE !!!!!!!!!!!!!!!!
     pp = np.zeros(p.size)
-    pp = 1 * np.abs(p)  # in mH2O
+    pp = 1 * np.abs(p)  # in mH2O, (in kPa???)
     w = a / np.power((1 + np.power((b * pp), c)), d) + e * (1 - (np.log10(pp + 1) / f))
     u = np.power((1 + np.power((b * pp), c)), d)
     dwdp = (b * c * d * u * np.power((b * pp), c)) / (b * pp * np.power(u, 3)) - e * (1 / (f * (pp + 1)))
@@ -150,7 +150,8 @@ def hydrConductivity(ks, wc, ws, a1, b1, c1):
 
 ## ## Vapor phase parameters to calculate
 def soilHumidity(p, T):
-    p = (1 / 0.102) * p  ##convert from mH2O to kPa
+    #p = (1 / 0.102) * p  ##convert from mH2O to kPa
+    #already in kPa
     p = np.abs(p);
     p = -p  # required p to be (-) to obtain ha between 0 - 1
     soilHumidity = np.exp(Mw * p / (R * (T + 273)))  ##numpy array inserted
@@ -205,8 +206,8 @@ def k_bar(i):
 def q_liquid(i):
     ## i is element number; upper p is i, lower is i+1
     ki, kn = k_bar(i)
-    qli = -(ki / (z[i + 1] - z[i]) * (pi[i + 1] - pi[i])) + ki
-    qln = -(kn / (z[i + 1] - z[i]) * (pn[i + 1] - pn[i])) + kn
+    qli = -(ki / (z[i + 1] - z[i]) * (pi[i + 1] - pi[i])) * 101.97 + ki   #ada konversi kPa ke mmH2O
+    qln = -(kn / (z[i + 1] - z[i]) * (pn[i + 1] - pn[i])) * 101.97 + kn   #ada konversi kPa ke mmH2O
     J_liquid = (1 - eps) * qli + eps * qln  ##flux hasil perhitungan antara dua timestep, bukan dua level iterasi
     print "qli, qln", qli, qln, pi[i + 1], pi[i], ki, kn
     return qli, qln, J_liquid
@@ -226,6 +227,9 @@ def kv_kvT(i):
     c3 = 1 + 2.64 / np.sqrt(my);
     eta = 9.5 + 3 * w[i] - (9.5 - 1) * np.exp(-np.power((c3 * w[i]), 4))
     ## humidity initial, and final end of timestep
+    #p[i] = p[i] * 101.97                #convert kPa to mmH2O
+    #pi[i] = p[i] * 101.97                #convert kPa to mmH2O
+    #pn[i] = p[i] * 101.97                #convert kPa to mmH2O
     h[i] = soilHumidity(p[i], T[i])
     hi[i] = soilHumidity(pi[i], Ti[i])
     hn[i] = soilHumidity(pn[i], Tn[i])
@@ -343,7 +347,7 @@ def thomasAlgorithm(i1, A, B, C, D):  ##tridiagonal matrix solution
         D[i] = D[i] / B[i]  ## update D
         B[i + 1] = B[i + 1] - A[i + 1] * C[i]  ## update B
         D[i + 1] = D[i + 1] - A[i + 1] * D[i]  ## update D
-        print "Thomas A B C D", A[i], B[i], C[i], D[i]
+        #print "Thomas A B C D", A[i], B[i], C[i], D[i]
     x[m] = D[m] / B[m];
     #print "PPPPPPPPPPPPPPPPPPPPPPPPPPP", pn[m], D[m] / B[m]
     #print x[15]
@@ -410,8 +414,10 @@ def solverWatEvapFlow(n, dt, flux, evap, psurface):
         #print "pi ", pi
         print "p ", p
         print "pn EUY !", pn
-        print "qln ", qln
-        print "qvn", qvn
+        print "wu", wu
+        print "wnu", wnu
+        #print "qln ", qln
+        #print "qvn", qvn
         print "Jv[0]", Jv[0]
         print "Jl[0]", Jl[0]
         se = 0
@@ -480,7 +486,7 @@ if __name__ == '__main__':  ## Run as standalone program
 
     ## calculate air humidity from data # ava. in EB prog
     e_sat, de_sat = SVP(Ta)
-    e_act = AVP(Ta, Twb, alt)
+    e_act = AVP(Ta, Twb, alt) #PERHATIKAN BARIS INI, RH AKAN BERNILAI 1, MENYEBABKAN PERHITUNGAN EVAP ADA PEMBAGI NOL
     RH = e_act / e_sat
     print 'RH', RH
 
