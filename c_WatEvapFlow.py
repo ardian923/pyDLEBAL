@@ -150,7 +150,8 @@ def hydrConductivity(ks, wc, ws, a1, b1, c1):
 
 ## ## Vapor phase parameters to calculate
 def soilHumidity(p, T):
-    p = (1 / 0.102) * p  ##convert from mH2O to kPa
+    #pp = (1 / 0.102) * p  ##convert from mH2O to kPa
+    #lets try still in kPa
     p = np.abs(p);
     p = -p  # required p to be (-) to obtain ha between 0 - 1
     soilHumidity = np.exp(Mw * p / (R * (T + 273)))  ##numpy array inserted
