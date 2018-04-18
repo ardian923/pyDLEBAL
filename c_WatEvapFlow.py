@@ -206,8 +206,8 @@ def k_bar(i):
 def q_liquid(i):
     ## i is element number; upper p is i, lower is i+1
     ki, kn = k_bar(i)
-    qli = -(ki / (z[i + 1] - z[i]) * (pi[i + 1] - pi[i])) * 1000 + ki   #ada konversi mH2O ke mmH2O
-    qln = -(kn / (z[i + 1] - z[i]) * (pn[i + 1] - pn[i])) * 1000 + kn   #ada konversi mH2O ke mmH2O
+    qli = -(ki / (z[i + 1] - z[i]) * (pi[i + 1] - pi[i])) + ki   #tetap pada satuan kg/(m^2 s) ~ mm/s
+    qln = -(kn / (z[i + 1] - z[i]) * (pn[i + 1] - pn[i])) + kn   #tetap pada satuan kg/(m^2 s) ~ mm/s
     J_liquid = (1 - eps) * qli + eps * qln  ##flux hasil perhitungan antara dua timestep, bukan dua level iterasi
     print "qli, qln", qli, qln, pi[i + 1], pi[i], ki, kn
     return qli, qln, J_liquid
@@ -225,34 +225,32 @@ def liqCoeff(i):
 ### Vapor phase of water==================================
 def kv_kvT(i):
     c3 = 1 + 2.64 / np.sqrt(my);
-    eta = 9.5 + 3 * w[i] - (9.5 - 1) * np.exp(-np.power((c3 * w[i]), 4))
+    eta = 9.5 + 3 * w[i] - (9.5 - 1) * np.exp(-np.power((c3 * w[i]), 4)) #conductivity (W m-1 K-1), eq.4.20, Campbell
     ## humidity initial, and final end of timestep
-    #p[i] = p[i] * 0.10197                #convert to kPa from mH2O
-    #pi[i] = p[i] * 0.10197               #convert to kPa from mH2O
-    #pn[i] = p[i] * 0.10197               #convert to kPa from mH2O
-    h[i] = soilHumidity(p[i], T[i])
-    hi[i] = soilHumidity(pi[i], Ti[i])
-    hn[i] = soilHumidity(pn[i], Tn[i])
+    # value of p is already in kPa
+    h[i] = soilHumidity(p[i], T[i])       #no unit
+    hi[i] = soilHumidity(pi[i], Ti[i])    #no unit
+    hn[i] = soilHumidity(pn[i], Tn[i])    #no unit
     hbar_i = 0.5 * (hi[i] + hi[i + 1])
     hbar_n = 0.5 * (hn[i] + hn[i + 1])
     ## porosity
-    phi_i = ws - 0.5 * (wnu[i] + wnl[i])
-    phi_n = ws - 0.5 * (wiu[i] + wil[i])
+    phi_i = ws - 0.5 * (wnu[i] + wnl[i])  #no unit
+    phi_n = ws - 0.5 * (wiu[i] + wil[i])  #no unit
     ## vapor concentration
-    rhov_sati, drhov_sati = SVC(Ti[i]);
-    rhov_i = h[i] * rhov_sati  ## actual vapor concentration at
+    rhov_sati, drhov_sati = SVC(Ti[i]);   #Kg/m3
+    rhov_i = h[i] * rhov_sati  ## actual vapor concentration at i (iteration level)
     rhov_satn, drhov_satn = SVC(Tn[i]);
-    rhov_n = h[i] * rhov_satn  ## actual vapor concentration at
+    rhov_n = h[i] * rhov_satn  ## actual vapor concentration at n (iteration level)
     ## conductivity for vapor, isothermal and non-isothermal(tempereture influenced) conductivity
     kvi = 0.66 * phi_i * Dv * (Mw / (R * (Ti[i] + 273))) * rhov_i  ## Dv, Mw inputted in spreedsheet
     kvTi = 0.66 * phi_i * Dv * drhov_sati * eta * hbar_i
     kvn = 0.66 * phi_n * Dv * (Mw / (R * (Tn[i] + 273))) * rhov_n
     kvTn = 0.66 * phi_n * Dv * drhov_satn * eta * hbar_n
     ## convert to m/s
-    kvi = kvi * (1 / 0.102) * (1 / rho_w)  ## 1 kPa = 0.102 mH2O, convert matriks to kPa before using this conduct
-    kvTi = kvTi * (1 / 0.102) * (1 / rho_w)  ## 1 kPa = 0.102 mH2O, convert matriks to kPa before using this conduct
-    kvn = kvn * (1 / 0.102) * (1 / rho_w)  ## 1 kPa = 0.102 mH2O, convert matriks to kPa before using this conduct
-    kvTn = kvTn * (1 / 0.102) * (1 / rho_w)  ## 1 kPa = 0.102 mH2O, convert matriks to kPa before using this conduct
+    #kvi = kvi * (1 / 0.102) * (1 / rho_w)  ## 1 kPa = 0.102 mH2O, convert matriks to kPa before using this conduct
+    #kvTi = kvTi * (1 / 0.102) * (1 / rho_w)  ## 1 kPa = 0.102 mH2O, convert matriks to kPa before using this conduct
+    #kvn = kvn * (1 / 0.102) * (1 / rho_w)  ## 1 kPa = 0.102 mH2O, convert matriks to kPa before using this conduct
+    #kvTn = kvTn * (1 / 0.102) * (1 / rho_w)  ## 1 kPa = 0.102 mH2O, convert matriks to kPa before using this conduct
     return kvi, kvn, kvTi, kvTn
 
 
@@ -297,9 +295,9 @@ def initSoilCondition(T):
     wnu[m + 1] = wnl[m + 1] = wu[m]
     # p[0] = p[1]
     # pi = pn = p ## pi initial timestep, p middle of timestep, pn end of timestep
-    h = soilHumidity(p, T);
-    hi = soilHumidity(pi, T);
-    hn = soilHumidity(pn, T);
+    h = soilHumidity(p, T);     #no unit
+    hi = soilHumidity(pi, T);   #no unit
+    hn = soilHumidity(pn, T);   #no unit
     z[0] = 0  # -1E+20;
     z[m + 1] = +1E+20  ## No upward vapor flux into bottom
     for i in xrange(1, m + 2, 1):
