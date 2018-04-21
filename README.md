@@ -71,3 +71,8 @@ Penman-Monteith equation take soil and canopy as isothermal. First term of the e
 Double Layer Energy Balance
 ---------------------------
 
+Double Layer Evapotranspiration Model Describe as : 
+
+![alt text][double_layer]
+
+[double_layer]: 0_double_layer.png "Double Layer Model"
