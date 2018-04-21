@@ -15,7 +15,7 @@ from xlutils.copy import copy
 
 # example writing and reading
 ################################
-workbook_name = 'doubleLayerEB.xls'
+workbook_name = '0_doubleLayerEB.xls'
 sheet_name    = 'Inputs'
 rb = open_workbook(workbook_name, formatting_info=True)
 wb = copy(rb)
