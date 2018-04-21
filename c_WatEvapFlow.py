@@ -6,6 +6,7 @@
 # ask for permission from me : ardi.plj@gmail.com (cc : ard@unsoed.ac.id) if you want to use this. It's free
 
 import numpy as np  ##numerical python library
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import scipy as sc  ##scientific python library
 import math as mth  ##matemathical operation library
@@ -492,6 +493,7 @@ if __name__ == '__main__':  ## Run as standalone program
     for i in xrange(time.size):
         print "=========================================================================="
         print "time = ", time[i], "======================================================"
+        print "Soil depth discretization", z
         ETp = rs1.cell_value(143,
                              2)  ## flux is converted in spreedsheet, from mm/day to m/(10 minutes), timestep is in 10 minutes
         flux = rs1.cell_value(144,
@@ -510,7 +512,60 @@ if __name__ == '__main__':  ## Run as standalone program
         for col in xrange(1, m + 1, 1):
             ws5.write(7 + i, col + 8, wnu[col])
             # ws5.write(7+i,6, col+8, hn[col])
-        ## dynamic graph in matplotlib
+        ## dynamic graph in matplotlib --> not implemented
+        # static graph for selected time
+        if (time[i] == 0):
+            time0 = time[i]
+            string_time0 = 'time = 0'
+            z0 = z[1:18]       # slicing z vector to make same size as p and w
+            p0 = pn
+            w0 = w
+        if (time[i] == 2):
+            time2 = time[i]
+            string_time2 = 'time = 2'
+            p2 = pn
+            w2 = w
+        if (time[i] == 10):
+            time10 = time[i]
+            string_time10 = 'time = 10'
+            p10 = pn
+            w10 = w
+        if (time[i] == 24):
+            time24 = time[i]
+            string_time24 = 'time = 24'
+            p24 = pn
+            w24 = w
 
     # Save editted worksheet
     wb.save(workbook_name)
+
+    # plot results
+    mpl.rc('font', family='serif')
+    mpl.rc('font', serif='Helvetica Neue')
+    mpl.rc('text', usetex='true')
+    mpl.rcParams.update({'font.size': 16})
+
+    fig1, (ax1, ax2) = plt.subplots(2, sharex=True)
+    ax1.plot(p0, z0, 'r-', label=string_time0)
+    ax1.plot(p2, z0, 'k-', label=string_time2)
+    ax1.plot(p10,z0, 'g-', label=string_time10)
+    ax1.plot(p24,z0, 'b-', label=string_time24)
+    ax1.legend(loc='upper left', shadow=False, frameon=False)
+    ax1.invert_yaxis()
+    #plt.ylim(ymax = 1, ymin = 0)
+    #plt.title('Matric Suction')
+    ax1.set_xlabel('Matric Potential ($\psi - kPa$)')
+    ax1.set_ylabel('Soil Depth ($cm$)')
+
+    ax2.plot(w0, z0, 'r-', label=string_time0)
+    ax2.plot(w2, z0, 'k-', label=string_time2)
+    ax2.plot(w10,z0, 'g-', label=string_time10)
+    ax2.plot(w24,z0, 'b-', label=string_time24)
+    ax2.legend(loc='upper left', shadow=False, frameon=False)
+    ax2.invert_yaxis()
+    #plt.ylim(ymax = 1, ymin = 0)
+    #plt.title('Matric Suction')
+    ax2.set_xlabel('Water Content ($\theta - cm^3/cm^3$)')
+    ax2.set_ylabel('Soil Depth ($cm$)')
+
+    plt.show()
