@@ -81,9 +81,12 @@ R      = rs1.cell_value(48, 2)  ## ava. in EB prog
 Dv     = rs1.cell_value(57, 2)  ## ava. in EB prog
 rho_w  = rs1.cell_value(54, 2)  ## ava. in EB prog
 p_init = rs1.cell_value(42, 2)  ## in kPa
-p_init = 1 * np.abs(p_init) * 0.102  ## convert kPa to mH2O
+#p_init = 1 * np.abs(p_init) * 0.102  ## convert kPa to mH2O
 alt    = rs1.cell_value(12, 2)  ## ava. in EB prog
-
+## Flux parameter for constant simulation
+ETp  = rs1.cell_value(143, 2)  ## flux is converted in spreedsheet, from mm/day to m/(10 minutes), timestep is in 10 minutes
+flux = rs1.cell_value(144, 2)  ## flux is converted in spreedsheet, from mm/day to m/(10 minutes), timestep is in 10 minutes
+psurface = rs1.cell_value(145, 2)  ## p at surface =1, set upper boundary condition for evaporation (positive). psurface >=0 flux boundary condition
 
 def geoGrid(depth, n, dz1):  ## Geometric grid with dry layer
     m = n - 2
@@ -122,10 +125,11 @@ def linGrid(depth, n, dz1):  ## Linear grid with dry layer
 
 ## Liquid phase parameters to calculate
 def waterCont(p, a, b, c, d, e, f):
-    ##consult spreedsheet for a, b, c, d, e and f
+    ## a, b, c, d, e and f is input in spreadsheet
     # p[p > ae] = ae #EVALUATE !!!!!!!!!!!!!!!!
-    pp = np.zeros(p.size)
-    pp = 1 * np.abs(p)  # in mH2O, (in kPa???)
+    # define local variable pp for this function only
+    #pp = np.zeros(p.size)
+    pp = 1 * np.abs(p) * 0.102 # in mH2O, from kPa. Equation requires mH2O
     w = a / np.power((1 + np.power((b * pp), c)), d) + e * (1 - (np.log10(pp + 1) / f))
     u = np.power((1 + np.power((b * pp), c)), d)
     dwdp = (b * c * d * u * np.power((b * pp), c)) / (b * pp * np.power(u, 3)) - e * (1 / (f * (pp + 1)))
@@ -151,8 +155,7 @@ def hydrConductivity(ks, wc, ws, a1, b1, c1):
 
 ## ## Vapor phase parameters to calculate
 def soilHumidity(p, T):
-    #pp = (1 / 0.102) * p  ##convert from mH2O to kPa
-    #lets try still in kPa
+    #p still in kPa
     p = np.abs(p);
     p = -p  # required p to be (-) to obtain ha between 0 - 1
     soilHumidity = np.exp(Mw * p / (R * (T + 273)))  ##numpy array inserted
@@ -279,20 +282,20 @@ def vapCoeff(i):
 
 def initSoilCondition(T):
     m = n - 2  ## 15 end node number that important
-    p = np.zeros(n);
+    p = np.zeros(n)
     p[:] = p_init
-    pi = np.zeros(n);
+    pi = np.zeros(n)
     pi[:] = p_init
-    pn = np.zeros(n);
+    pn = np.zeros(n)
     pn[:] = p_init
     ## ks, ws, pe are global variables that includ
     wu, dwudp = waterCont(p, a, b, c, d, e, f);
-    wl = 1 * wu;
+    wl = 1 * wu
     dwnudp = 1 * dwudp
-    wiu = 1 * wu;
-    wil = 1 * wu;
-    wnu = 1 * wu;
-    wnl = 1 * wu;
+    wiu = 1 * wu
+    wil = 1 * wu
+    wnu = 1 * wu
+    wnl = 1 * wu
     wnu[m + 1] = wnl[m + 1] = wu[m]
     # p[0] = p[1]
     # pi = pn = p ## pi initial timestep, p middle of timestep, pn end of timestep
@@ -309,17 +312,17 @@ def initSoilCondition(T):
 
 
 def boundaryCondition(flux, evap, psurface):
-    Jl = np.zeros(n);
-    qli = np.zeros(n);
+    Jl = np.zeros(n)
+    qli = np.zeros(n)
     qln = np.zeros(n)  ## assign liquid flux in all nodes
-    Jv = np.zeros(n);
-    qvi = np.zeros(n);
+    Jv = np.zeros(n)
+    qvi = np.zeros(n)
     qvn = np.zeros(n)  ## assign vapor flux in all nodes
-    UpLCoefn = np.zeros(n);
-    LowLCoefn = np.zeros(n);
+    UpLCoefn = np.zeros(n)
+    LowLCoefn = np.zeros(n)
     ResLCoefn = np.zeros(n)
-    UpVCoefn = np.zeros(n);
-    LowVCoefn = np.zeros(n);
+    UpVCoefn = np.zeros(n)
+    LowVCoefn = np.zeros(n)
     ResVCoefn = np.zeros(n)
     ## surface boundary condition
     if (psurface < 0):
@@ -329,9 +332,9 @@ def boundaryCondition(flux, evap, psurface):
             p[1] = psurface
     else:
         ## flux boundary condition
-        Jl[0] = flux;
+        Jl[0] = flux
         qli[0] = qln[0] = Jl[0]  ## flux boundary condition, time average flux for flux boundary condition
-        Jv[0] = evap;
+        Jv[0] = evap
         qvi[0] = qvn[0] = Jv[0]
         UpLCoefn[0] = LowLCoefn[0] = ResLCoefn[0] = 0
         UpVCoefn[0] = LowVCoefn[0] = ResVCoefn[0] = 0
@@ -466,11 +469,10 @@ if __name__ == '__main__':  ## Run as standalone program
     Tn = 1 * T  ## When soil is non-isothermal, remove this line to replace T with temperature profile
     wu, wl, wiu, wil, wnu, wnl, dwudp, dwnudp, pi, p, pn, hi, h, hn, v = initSoilCondition(T)
     w = element_w()
-    psurface = rs1.cell_value(145,
-                              2)  ## p at surface =1, set upper boundary condition for evaporation (positive). psurface >=0 flux boundary condition
-    dt = dt / 3600  ##
-    time = np.arange(inittime, endtime + 0.1, dt)  ##create time array from 0 to 24 (1 day)
 
+    dt = dt / 3600  ##
+
+    time = np.arange(inittime, endtime + 0.1, dt)  ##create time array from 0 to endtime
     ## ==================== Atmospheric Factor Influencing Evaporation============
     # obtain data value of Ta and Twb for calculating RH of air  # ava. in EB prog
     ## sensor measurement input or Fourier input or data input # ava. in EB prog
@@ -478,7 +480,7 @@ if __name__ == '__main__':  ## Run as standalone program
     Twb = np.zeros(time.size)  ##allocating space for Ta wet bulb array # ava. in EB prog
     RH = np.zeros(time.size)  ##allocating space for RH array, calculated from Ta wet bulb # ava. in EB prog
     i = 0
-    for row in range(12, 157):
+    for row in range(12, 157): # 24 hours
         Ta[i] = rs2.cell_value(row, 7)
         Twb[i] = rs2.cell_value(row, 8)
         i = i + 1
@@ -494,10 +496,7 @@ if __name__ == '__main__':  ## Run as standalone program
         print "=========================================================================="
         print "time = ", time[i], "======================================================"
         print "Soil depth discretization", z
-        ETp = rs1.cell_value(143,
-                             2)  ## flux is converted in spreedsheet, from mm/day to m/(10 minutes), timestep is in 10 minutes
-        flux = rs1.cell_value(144,
-                              2)  ## flux is converted in spreedsheet, from mm/day to m/(10 minutes), timestep is in 10 minutes
+
         ## for constant evaporation and infiltration through day, single value inputted. For not changing value put in spreedsheet and
         evap = (ETp / (1 - RH[i])) * (h[1] - RH[i])  ## actual evaporation from bare surface
         ## obtain the value through looping
@@ -545,7 +544,7 @@ if __name__ == '__main__':  ## Run as standalone program
     mpl.rc('text', usetex='true')
     mpl.rcParams.update({'font.size': 16})
 
-    fig1, (ax1, ax2) = plt.subplots(2, sharex=True)
+    fig1, (ax1, ax2) = plt.subplots(ncols=2)
     ax1.plot(p0, z0, 'r-', label=string_time0)
     ax1.plot(p2, z0, 'k-', label=string_time2)
     ax1.plot(p10,z0, 'g-', label=string_time10)
@@ -565,7 +564,7 @@ if __name__ == '__main__':  ## Run as standalone program
     ax2.invert_yaxis()
     #plt.ylim(ymax = 1, ymin = 0)
     #plt.title('Matric Suction')
-    ax2.set_xlabel('Water Content ($\theta - cm^3/cm^3$)')
+    ax2.set_xlabel('Water Content ($\\theta - cm^3/cm^3$)')
     ax2.set_ylabel('Soil Depth ($cm$)')
 
     plt.show()
