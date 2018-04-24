@@ -400,7 +400,6 @@ def solverWatEvapFlow(n, dt, flux, evap, psurface):
                 D[i] = -(1 - eps) * ((qli[i - 1] - qli[i]) + (qvi[i - 1] + qvi[i])) - cpu[i] * p[i] + (
                             wu[i] - wiu[i]) * (v[i] / dt) - (ResLCoefn[i] - ResLCoefn[i - 1]) - (
                                    ResVCoefn[i] + ResVCoefn[i - 1])
-        #print "qvn[0], qln[0],qvn[0]-qln[0] ", qln[0], qvn[0], qvn[0] - qln[0]
         ## preparing to solve tridiagonal matrix
         if (psurface < 0):  ## dirichlet BC not flux BC, start calculation from i = 2
             D[1] = 0;
@@ -415,11 +414,9 @@ def solverWatEvapFlow(n, dt, flux, evap, psurface):
         wnu, dwnudp = waterCont(pn, a, b, c, d, e, f)
         #print "pi ", pi
         print "p ", p
-        print "pn EUY !", pn
+        print "pn", pn
         print "wu", wu
         print "wnu", wnu
-        #print "qln ", qln
-        #print "qvn", qvn
         print "Jv[0]", Jv[0]
         print "Jl[0]", Jl[0]
         se = 0
@@ -499,6 +496,7 @@ if __name__ == '__main__':  ## Run as standalone program
 
         ## for constant evaporation and infiltration through day, single value inputted. For not changing value put in spreedsheet and
         evap = (ETp / (1 - RH[i])) * (h[1] - RH[i])  ## actual evaporation from bare surface
+        #evap = ETp #try
         ## obtain the value through looping
         se, nits = solverWatEvapFlow(n, dt, flux, evap, psurface)
         # write simulation result to spreedsheet
@@ -513,24 +511,20 @@ if __name__ == '__main__':  ## Run as standalone program
             # ws5.write(7+i,6, col+8, hn[col])
         ## dynamic graph in matplotlib --> not implemented
         # static graph for selected time
-        if (time[i] == 0):
-            time0 = time[i]
+        if (time[i] == 0.):
             string_time0 = 'time = 0'
             z0 = z[1:18]       # slicing z vector to make same size as p and w
             p0 = pn
             w0 = w
-        if (time[i] == 2):
-            time2 = time[i]
+        if (time[i] == 2.):
             string_time2 = 'time = 2'
             p2 = pn
             w2 = w
-        if (time[i] == 10):
-            time10 = time[i]
+        elif (time[i] == 10.):
             string_time10 = 'time = 10'
             p10 = pn
             w10 = w
-        if (time[i] == 24):
-            time24 = time[i]
+        elif (time[i] == 24.):
             string_time24 = 'time = 24'
             p24 = pn
             w24 = w
@@ -551,10 +545,11 @@ if __name__ == '__main__':  ## Run as standalone program
     ax1.plot(p24,z0, 'b-', label=string_time24)
     ax1.legend(loc='upper left', shadow=False, frameon=False)
     ax1.invert_yaxis()
+    ax1.set_xlim([-1500, 0])
     #plt.ylim(ymax = 1, ymin = 0)
     #plt.title('Matric Suction')
     ax1.set_xlabel('Matric Potential ($\psi - kPa$)')
-    ax1.set_ylabel('Soil Depth ($cm$)')
+    ax1.set_ylabel('Soil Depth ($m$)')
 
     ax2.plot(w0, z0, 'r-', label=string_time0)
     ax2.plot(w2, z0, 'k-', label=string_time2)
@@ -562,9 +557,10 @@ if __name__ == '__main__':  ## Run as standalone program
     ax2.plot(w24,z0, 'b-', label=string_time24)
     ax2.legend(loc='upper left', shadow=False, frameon=False)
     ax2.invert_yaxis()
+    ax2.set_xlim([0, 0.45])
     #plt.ylim(ymax = 1, ymin = 0)
     #plt.title('Matric Suction')
     ax2.set_xlabel('Water Content ($\\theta - cm^3/cm^3$)')
-    ax2.set_ylabel('Soil Depth ($cm$)')
+    ax2.set_ylabel('Soil Depth ($m$)')
 
     plt.show()
