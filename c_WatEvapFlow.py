@@ -213,7 +213,8 @@ def q_liquid(i):
     qli = -(ki / (z[i + 1] - z[i]) * (pi[i + 1] - pi[i])) + ki   #tetap pada satuan kg/(m^2 s) ~ mm/s
     qln = -(kn / (z[i + 1] - z[i]) * (pn[i + 1] - pn[i])) + kn   #tetap pada satuan kg/(m^2 s) ~ mm/s
     J_liquid = (1 - eps) * qli + eps * qln  ##flux hasil perhitungan antara dua timestep, bukan dua level iterasi
-    print "qli, qln", qli, qln, pi[i + 1], pi[i], ki, kn
+    print "i, qli,      qln,      p[i+1],      p[i],      ki,      kn"
+    print i, qli, qln, pi[i + 1], pi[i], ki, kn
     return qli, qln, J_liquid
 
 
@@ -265,7 +266,8 @@ def q_vapor(i):  ## non-isothermal flow, in case of isothermal deltaT = 0
     qvn = (1 / (z[i + 1] - z[i])) * (-kvn * (pn[i + 1] - pn[i]) - kvTn * (Tn[i + 1] - Tn[i]))
     J_vapor = (1 - eps) * qvi + eps * qvn  ## flux hasil perhitungan antara dua timestep, bukan dua level iterasi
     ## htsrc = 10 * lamda * (kvn * rho_w) * (pn[i+1]-pn[i]) ## input for heat flux calculation(J/m2.s), qT = q + htsrc
-    print "qvi, qvn", qvi, qvn
+    print "i,      qvi,       qvn,      kvi,      kvn,      kvTi,      kvTn"
+    print i, qvi, qvn, kvi, kvn, kvTi, kvTn
     return qvi, qvn, J_vapor
 
 
@@ -477,7 +479,7 @@ if __name__ == '__main__':  ## Run as standalone program
     Twb = np.zeros(time.size)  ##allocating space for Ta wet bulb array # ava. in EB prog
     RH = np.zeros(time.size)  ##allocating space for RH array, calculated from Ta wet bulb # ava. in EB prog
     i = 0
-    for row in range(12, 157): # 24 hours
+    for row in range( 12, int(12+1 +(6*endtime)) ): # endtime = 24 or 48 hours or more
         Ta[i] = rs2.cell_value(row, 7)
         Twb[i] = rs2.cell_value(row, 8)
         i = i + 1
@@ -495,8 +497,8 @@ if __name__ == '__main__':  ## Run as standalone program
         print "Soil depth discretization", z
 
         ## for constant evaporation and infiltration through day, single value inputted. For not changing value put in spreedsheet and
-        evap = (ETp / (1 - RH[i])) * (h[1] - RH[i])  ## actual evaporation from bare surface
-        #evap = ETp #try
+        #evap = (ETp / (1 - RH[i])) * (h[1] - RH[i])  ## actual evaporation from bare surface
+        evap = ETp #try, evaporation were calculated separately, not from humidity difference between soil and air
         ## obtain the value through looping
         se, nits = solverWatEvapFlow(n, dt, flux, evap, psurface)
         # write simulation result to spreedsheet
@@ -511,20 +513,20 @@ if __name__ == '__main__':  ## Run as standalone program
             # ws5.write(7+i,6, col+8, hn[col])
         ## dynamic graph in matplotlib --> not implemented
         # static graph for selected time
-        if (time[i] == 0.):
+        if (int(time[i]) == 0) and (time[i]-int(time[i])<0.1):
             string_time0 = 'time = 0'
             z0 = z[1:18]       # slicing z vector to make same size as p and w
             p0 = pn
             w0 = w
-        if (time[i] == 2.):
+        if (int(time[i]) == 2) and (time[i]-int(time[i])<0.1):
             string_time2 = 'time = 2'
             p2 = pn
             w2 = w
-        elif (time[i] == 10.):
+        if (int(time[i]) == 10) and (time[i]-int(time[i])<0.1):
             string_time10 = 'time = 10'
             p10 = pn
             w10 = w
-        elif (time[i] == 24.):
+        if (int(time[i]) == 24) and (time[i]-int(time[i])<0.1):
             string_time24 = 'time = 24'
             p24 = pn
             w24 = w
