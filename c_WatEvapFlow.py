@@ -304,7 +304,7 @@ def initSoilCondition(T):
     h = soilHumidity(p, T);     #no unit
     hi = soilHumidity(pi, T);   #no unit
     hn = soilHumidity(pn, T);   #no unit
-    z[0] = 0  # -1E+20;
+    z[0] = 0 #-1E+20;
     z[m + 1] = +1E+20  ## No upward vapor flux into bottom
     for i in xrange(1, m + 2, 1):
         v[i] = (z[i + 1] - z[i - 1]) / 2  ## dz
@@ -454,7 +454,7 @@ if __name__ == '__main__':  ## Run as standalone program
     # z = geoGrid(depth, n , dz1) ## geometric grid
     z = linGrid(depth, n, dz1)  ## linear grid
     for col in xrange(1, m + 2, 1):
-        ws5.write(5, 7 + col, z[col])
+        ws5.write(5, 8 + col, z[col])
 
     v = np.zeros(n)  ## dz
     ## htsrc = np.zeros(n) ## heat source for heat flow problem
